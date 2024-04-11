@@ -1,7 +1,28 @@
-# About
-This is the demo site for [Fuwari](https://github.com/saicaca/fuwari).
+# About 
+Someone deeply passionate about video games, I'm fascinated by every aspect of their design, whether it's the captivating gameplay mechanics or the intricate programming that brings them to life.
 
-> ### Sources of images used in this site
-> - [Unsplash](https://unsplash.com/)
-> - [星と少女](https://www.pixiv.net/artworks/108916539) by [Stella](https://www.pixiv.net/users/93273965)
-> - [Rabbit - v1.4 Showcase](https://civitai.com/posts/586908) by [Rabbit_YourMajesty](https://civitai.com/user/Rabbit_YourMajesty)
+ENGLISH / PORTUGUESE OK!
+
+## Skills 🧠 
+
+> ### Programming Languages 💻
+> - C#
+> - GDScript
+> - Rust
+> - Python
+
+> ### Game Engines 🎮 
+> - Unity
+> - Godot
+> - Unreal Engine
+
+> ### Design Software 🎨 
+> - Blender
+> - Adobe Photoshop
+> - Adobe Premiere
+> - Gimp
+> - Krita
+
+### Extra Info 📝📔
+
+Currently living with [visual snow syndrome](https://www.visualsnowinitiative.org/learn/) and [tinnitus](https://en.wikipedia.org/wiki/Tinnitus) (no hearing loss). It has made my journey through life significantly harder but I keep moving forward nonetheless.
