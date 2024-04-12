@@ -34,7 +34,7 @@ export const navBarConfig: NavBarConfig = {
 export const profileConfig: ProfileConfig = {
   avatar: 'assets/images/avatars/oyasumi-punpun-png-8-cropped.png',
   name: 'Inácio Reina Maio',
-  bio: 'Aspiring game developer with a passion for game design and programming.',
+  bio: 'A game developer with a passion for game design and programming.',
   links: [
     {
       name: 'Linkedin',
