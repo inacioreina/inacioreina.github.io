@@ -42,6 +42,8 @@ const myFade = {
 	backwards: anim,
 };
 
+
+
 // defines global css variables
 // why doing this in Layout instead of GlobalStyles: https://github.com/withastro/astro/issues/6728#issuecomment-1502203757
 const configHue = siteConfig.themeHue;
@@ -66,7 +68,6 @@ if (title) {
 <!DOCTYPE html>
 <html lang="en" isHome={isHomePage} pathname={testPathName} class="bg-[var(--page-bg)] transition text-[14px] md:text-[16px]">
 	<head>
-
 		<title>{pageTitle}</title>
 
 		<meta charset="UTF-8" />
@@ -84,7 +85,16 @@ if (title) {
 
 		<link rel="stylesheet" href="https://cdn.staticfile.org/KaTeX/0.16.9/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
 
-		<style define:vars={{ configHue }}></style>  <!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why -->
+		<style define:vars={{ configHue }}>  <!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why -->
+
+		.dot {
+			width: 3px;
+			height: 3px;
+			background-color: white;
+			border-radius: 50%;
+			position: absolute;
+		}
+		</style>
 
 	</head>
 	<body class=" min-h-screen transition " class:list={[{"is-home": isHomePage, "enable-banner": enableBanner}]}>
@@ -95,6 +105,7 @@ if (title) {
 					  src={siteConfig.banner.src}
 			>
 			</ImageWrapper>
+			<canvas id="canvas" width="800" height="600"></canvas>
 		</div>
 		<slot />
 		</GlobalStyles>
@@ -143,6 +154,17 @@ import {
 	ClickScrollPlugin
 } from 'overlayscrollbars';
 import {getHue, setHue} from "../utils/setting-utils";
+import { sineIn } from 'svelte/easing';
+
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d');
+let balls = [];
+const numBalls = 300;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth; 
+  canvas.height = window.innerHeight; 
+}
 
 	/* Preload fonts */
 // (async function() {
@@ -265,6 +287,8 @@ function init() {
 	loadTheme();
 	loadHue();
 	initCustomScrollbar();
+	resizeCanvas()
+	animate();
 }
 
 /* Load settings when entering the site */
@@ -298,6 +322,86 @@ if (window.swup.hooks) {
 	document.addEventListener('swup:enable', setup)
 }
 
+// I need to clean this up later
+// Ball class
+class Ball {
+  constructor(x, y, dx, dy, radius, color, glowRadius) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.radius = radius;
+    this.color = color;
+	this.glowRadius = glowRadius;
+  }
+  draw() {
+
+	// Glow
+	ctx.beginPath();
+	ctx.arc(this.x, this.y, this.glowRadius, 0, Math.PI * 2);
+	ctx.fillStyle = `rgba(11,156,49,0.5)`;
+	ctx.fill();
+	ctx.closePath();
+
+	// Ball
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+    ctx.closePath();
+  }
+  update() {
+	this.glowRadius = this.radius * 1.1 + sineIn(1 / 0.1) * 2;
+    this.x += this.dx;
+    this.y += this.dy;
+    // Check collision with walls
+    if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
+      this.dx = -this.dx; // Reverse direction
+    }
+    if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
+      this.dy = -this.dy; // Reverse direction
+    }
+    this.draw();
+  }
+  checkCollision(otherBall) {
+    const dx = this.x - otherBall.x;
+    const dy = this.y - otherBall.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance < this.radius + otherBall.radius) {
+      // Balls collide, change direction
+      const tempDx = this.dx;
+      const tempDy = this.dy;
+      this.dx = otherBall.dx;
+      this.dy = otherBall.dy;
+      otherBall.dx = tempDx;
+      otherBall.dy = tempDy;
+    }
+  }
+}
+// Initialize balls
+for (let i = 0; i < numBalls; i++) {
+  const radius = 5;
+  const glowRadius = 10;
+  const x = Math.random() * (canvas.width - 2 * radius) + radius;
+  const y = Math.random() * (canvas.height - 2 * radius) + radius;
+  const dx = (Math.random() - 0.5) * .1; // Random speed in x direction
+  const dy = (Math.random() - 0.5) * .1; // Random speed in y direction
+  //const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+  const color = `rgb(255,255,255)`;
+  balls.push(new Ball(x, y, dx, dy, radius, color));
+}
+function animate() {
+  requestAnimationFrame(animate);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  balls.forEach(ball => {
+    ball.update();
+    balls.forEach(otherBall => {
+      if (ball !== otherBall) {
+        ball.checkCollision(otherBall);
+      }
+    });
+  });
+}
 </script>
 
 <style is:global lang="stylus">
